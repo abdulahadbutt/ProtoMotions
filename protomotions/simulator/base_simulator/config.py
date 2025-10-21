@@ -2,7 +2,7 @@ from dataclasses import dataclass, field
 from typing import Literal, Tuple, List, Dict, Optional, Any, Type, TypeVar
 import torch
 from enum import Enum
-            
+from omegaconf import MISSING    
 
 T = TypeVar('T')
 
@@ -298,8 +298,8 @@ class SimulatorConfig(ConfigBuilder):
     robot: RobotConfig
     num_envs: int
     sim: SimParams
-    experiment_name: str
-    plane: PlaneConfig = PlaneConfig()
+    experiment_name: str = MISSING
+    plane: PlaneConfig = field(default_factory=PlaneConfig)  
     camera: Optional[Any] = None
     record_viewer: bool = False
     viewer_record_dir: str = "output/recordings/viewer"

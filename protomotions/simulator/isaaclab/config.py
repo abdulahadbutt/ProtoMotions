@@ -1,4 +1,4 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from protomotions.simulator.base_simulator.config import SimParams, SimulatorConfig
 from protomotions.simulator.isaacgym.config import IsaacGymPhysXParams
 
@@ -14,12 +14,13 @@ class IsaacLabPhysXParams(IsaacGymPhysXParams):
 @dataclass
 class IsaacLabSimParams(SimParams):
     """PhysX-specific simulation parameters used by IsaacGym and IsaacLab."""
-    physx: IsaacLabPhysXParams = IsaacLabPhysXParams()
+    physx: IsaacLabPhysXParams = field(default_factory=IsaacLabPhysXParams)
 
 
 @dataclass
 class IsaacLabSimulatorConfig(SimulatorConfig):
     """Configuration specific to IsaacLab simulator."""
-    sim: IsaacLabSimParams  # Override sim type
+    sim: IsaacLabSimParams = field(default_factory=IsaacLabSimParams)  # Override sim type
+    
     def __post_init__(self):
         self.w_last = False  # IsaacLab uses wxyz quaternions
