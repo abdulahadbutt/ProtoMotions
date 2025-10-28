@@ -51,6 +51,21 @@ class H1_MotionLib(MotionLib):
 
     def _load_motion_file(self, motion_file):
         motion = EasyDict(torch.load(motion_file))
+        # torch_data = {k: torch.from_numpy(v) for k, v in np.load(path, allow_pickle=True).items() if np.issubdtype(v.dtype, np.number)}
+        # if motion_file.endswith((".pt", ".pth")):
+        #     motion = EasyDict(torch.load(motion_file))
+
+        # elif motion_file.endswith(".npz"):
+        #     npz_data = np.load(motion_file, allow_pickle=True)
+        #     # ? Only getting the numerical data as torch tensors
+        #     torch_data = {k: torch.from_numpy(v) for k, v in npz_data.items() if np.issubdtype(v.dtype, np.number)}
+        #     torch_data['dof_pos'] = torch_data['dof_positions']
+        #     torch_data['fps'] = torch_data['fps'].item()
+        #     # motion = torch.from_numpy(npz_data)
+        #     motion = EasyDict(torch_data)
+        # else:
+        #     raise ValueError(f"Unsupported motion file format: {motion_file}")
+
         motion.local_rotation = dof_to_local(motion.dof_pos, self.robot_config.dof_offsets,
                                              self.robot_config.joint_axis, True)
 

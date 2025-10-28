@@ -101,7 +101,7 @@ class MotionLib(DeviceDtypeModuleMixin):
         )
 
         if str(motion_file).split(".")[-1] in ["yaml", "npy", "npz", "np"]:
-            print("Loading motions from yaml/npy file")
+            print(f"Loading motions from yaml/npy file: {motion_file}")
             self._load_motions(motion_file, target_frame_rate)
         else:
             rank = _get_rank()
