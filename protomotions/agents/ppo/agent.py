@@ -23,6 +23,14 @@ from protomotions.envs.base_env.env import BaseEnv
 from protomotions.utils.running_mean_std import RunningMeanStd
 from rich.progress import track
 from protomotions.agents.ppo.utils import discount_values, bounds_loss
+import gc
+
+def flush_cuda():
+    gc.collect()                    # drop Python refs
+    torch.cuda.empty_cache()        # release cached blocks to the driver
+    torch.cuda.ipc_collect()        # reclaim interprocess handles (helps w/ Isaac)
+    torch.cuda.reset_peak_memory_stats() 
+
 
 log = logging.getLogger(__name__)
 
@@ -411,9 +419,11 @@ class PPO:
                     raise ValueError("NaN in training")
 
             # Update actor
+            flush_cuda()
             actor_loss, actor_loss_dict = self.actor_step(batch_dict)
             iter_log_dict.update(actor_loss_dict)
             self.actor_optimizer.zero_grad(set_to_none=True)
+            flush_cuda()
             self.fabric.backward(actor_loss)
             actor_grad_clip_dict = self.handle_model_grad_clipping(
                 self.model._actor, self.actor_optimizer, "actor"
@@ -422,9 +432,11 @@ class PPO:
             self.actor_optimizer.step()
 
             # Update critic
+            flush_cuda()
             critic_loss, critic_loss_dict = self.critic_step(batch_dict)
             iter_log_dict.update(critic_loss_dict)
             self.critic_optimizer.zero_grad(set_to_none=True)
+            flush_cuda()
             self.fabric.backward(critic_loss)
             critic_grad_clip_dict = self.handle_model_grad_clipping(
                 self.model._critic, self.critic_optimizer, "critic"
@@ -433,6 +445,7 @@ class PPO:
             self.critic_optimizer.step()
 
             # Extra optimization steps if needed.
+            flush_cuda()
             extra_opt_steps_dict = self.extra_optimization_steps(batch_dict, batch_idx)
             iter_log_dict.update(extra_opt_steps_dict)
 
